@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.pagination import PageNumberPagination
 
 from .permissions import IsOwner
 from .serializers import (PlaceSerializer)
@@ -26,6 +27,7 @@ class PlaceDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Place.objects.all()
     permission_classes = [permissions.IsAuthenticated, IsOwner]  # todo isowner kaldır sonra
     lookup_field = 'id'
+    pagination_class =PageNumberPagination
 
     def perform_create(self, serializer):
         return serializer.save(created_by=self.request.user)

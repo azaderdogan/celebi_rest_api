@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = [
     'rest_framework',
     'django_extensions',
     'drf_yasg',
+    'geolocation_fields',
 ]
 
 LOCAL_APPS = [
@@ -168,3 +169,4 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
+GOOGLE_MAPS_API_KEY = 'AIzaSyBWUjcfoRwQMSHaBvqNMg9oyKV7T2o50-A'
