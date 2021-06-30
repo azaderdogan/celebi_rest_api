@@ -2,8 +2,8 @@ from django.db import models
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager, PermissionsMixin)
 from django.core.mail import send_mail
 from django.utils.translation import gettext_lazy as _
-from django_countries.fields import CountryField
 from rest_framework_simplejwt.tokens import RefreshToken
+from countries_plus.models import Country
 
 
 class CustomAccountManager(BaseUserManager):
@@ -35,18 +35,16 @@ class CustomAccountManager(BaseUserManager):
 
 
 class UserBase(AbstractBaseUser, PermissionsMixin):
+
     email = models.EmailField(_('email address'), unique=True)
     username = models.CharField(max_length=150, unique=True)
-    first_name = models.CharField(max_length=150, blank=True)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
     about = models.TextField(_('about'), max_length=500, blank=True)
 
     # delivery details.
-    country = CountryField()
-    phone_number = models.CharField(max_length=15, blank=True)
-    postcode = models.CharField(max_length=12, blank=True)
-    address_line_1 = models.CharField(max_length=150, blank=True)
-    address_line_2 = models.CharField(max_length=150, blank=True)
-    town_city = models.CharField(max_length=150, blank=True)
+    country = models.ForeignKey(Country,null=True,blank=True,on_delete=models.CASCADE)
+    date_of_birth = models.DateField(blank=True,null=True)
 
     # user status
     is_verified = models.BooleanField(default=False)
@@ -57,7 +55,7 @@ class UserBase(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomAccountManager()
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ['username','first_name','last_name']
 
     class Meta:
         verbose_name = 'Accounts'

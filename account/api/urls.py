@@ -1,7 +1,8 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .views import (RegisterView, VerifyEmail, LoginApiView, PasswordTokenCheckAPI,RequestPasswordResetEmail,SetNewPasswordAPIView)
+from .views import (RegisterView, VerifyEmail, LoginApiView, PasswordTokenCheckAPI, RequestPasswordResetEmail,
+                    SetNewPasswordAPIView,)
 
 app_name = 'account'
 urlpatterns = [
@@ -13,9 +14,10 @@ urlpatterns = [
     path('password-reset/<uidb64>/<token>/', PasswordTokenCheckAPI.as_view(), name = 'password_reset_confirm'),
     path('password-reset-complete/', SetNewPasswordAPIView.as_view(), name = 'password_reset_complete'),
 
+
 ]
 
-"""
+""" 
 Kullanıcılara iki tür token verilir. 1. refresh token 2. access token. 
 Access token: kısa süreli kullanımdır. 
 Refresh token: Accesse nispeten daha uzun  süre kullanılır. Access token süre dolduğunda refresh token kullanarak

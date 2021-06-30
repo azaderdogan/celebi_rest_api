@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -44,7 +44,8 @@ THIRD_PARTY_APPS = [
     'rest_framework',
     'django_extensions',
     'drf_yasg',
-    'geolocation_fields',
+    'countries_plus'
+
 ]
 
 LOCAL_APPS = [
@@ -150,11 +151,13 @@ MEDIA_ROOT = 'uploads'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_METADATA_CLASS': 'rest_framework.metadata.SimpleMetadata',
     'PAGE_SIZE': 10,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',  # browsable api
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
+
 }
 AUTH_USER_MODEL = 'account.UserBase'
 EMAIL_USE_TLS = True

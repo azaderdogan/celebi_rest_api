@@ -1,6 +1,6 @@
+from countries_plus.models import Country
 from django.contrib.auth import authenticate
 from django.urls import reverse
-from django_countries.serializers import CountryFieldMixin
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -11,12 +11,22 @@ from account.models import UserBase
 from account.utils import Util
 
 
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ['pk', 'iso3', 'name']
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=68, min_length=6, write_only=True)
 
     class Meta:
         model = UserBase
-        fields = ['email', 'username', 'password']
+        fields = ['first_name', 'last_name', 'email', 'username', 'password', 'date_of_birth', 'country']
+
+    def to_representation(self, instance):
+        self.fields['country'] = CountrySerializer(read_only=True)
+        return super(RegisterSerializer, self).to_representation(instance)
 
     def validate(self, attrs):
         email = attrs.get('email', '')
@@ -26,10 +36,14 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'The username should only contain alphanumeric character'
             )
+        # todo country eklet
+        country = attrs.get('country')
+
         return attrs
 
     def create(self, validated_data):
         return UserBase.objects.create_user(**validated_data)
+        # return UserBase.objects.create_user(**validated_data)
 
 
 class EmailVerificationSerializer(serializers.ModelSerializer):
@@ -40,15 +54,25 @@ class EmailVerificationSerializer(serializers.ModelSerializer):
         fields = ['token']
 
 
+class TokenSerializer(serializers.Serializer):
+    refresh = serializers.CharField(read_only=True)
+    access = serializers.CharField(read_only=True)
+
+    class Meta:
+        fields = ['refresh', 'access']
+        read_only_fields = ['refresh', 'access']
+
+
 class LoginSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=255, min_length=3)
     password = serializers.CharField(max_length=68, min_length=6, write_only=True)
     username = serializers.CharField(max_length=255, min_length=3, read_only=True)
-    tokens = serializers.CharField(max_length=68, min_length=6, read_only=True)
+    tokens = TokenSerializer(read_only=True)
 
     class Meta:
         model = UserBase
         fields = ['email', 'password', 'username', 'tokens']
+        read_only_fields = ['tokens']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
@@ -70,7 +94,6 @@ class LoginSerializer(serializers.ModelSerializer):
             'username': user.username,
             'tokens': user.tokens()
         }
-        return super(LoginSerializer, self).validate(attrs)
 
 
 class RequestPasswordResetEmailSerializer(serializers.Serializer):
@@ -103,7 +126,4 @@ class SetNewPasswordSerializer(serializers.Serializer):
             user.save()
             return (user)
         except Exception as e:
-            raise AuthenticationFailed('The reset link is invalid.',401)
-        return super(SetNewPasswordSerializer, self).validate(attrs)
-        
-
+            raise AuthenticationFailed('The reset link is invalid.', 401)

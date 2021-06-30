@@ -1,12 +1,15 @@
+import rest_framework.metadata
 from rest_framework import generics, status, views
+from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from . import serializers
 from .renderers import UserRenderer
 from .serializers import (EmailVerificationSerializer, LoginSerializer, RegisterSerializer, SetNewPasswordSerializer,
-    RequestPasswordResetEmailSerializer)
+                          RequestPasswordResetEmailSerializer)
 from ..models import UserBase
 from ..utils import Util
 import jwt
@@ -25,6 +28,7 @@ class RegisterView(generics.GenericAPIView):
 
     def post(self, request):
         user = request.data
+
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -134,3 +138,4 @@ class SetNewPasswordAPIView(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response({'success': True, 'message': 'Password reset success.'}, status=status.HTTP_200_OK)
+
